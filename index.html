@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="description"
+        content="WavBench: Benchmarking Reasoning, Colloquialism, and Paralinguistics for End-to-End Spoken Dialogue Models.">
+  <meta name="keywords" content="WavBench, Spoken Dialogue, Audio LLM, Benchmark, AI, NLP">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>WavBench: Benchmarking Reasoning, Colloquialism, and Paralinguistics</title>
+
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-PYVRSFMDRL"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag() { dataLayer.push(arguments); }
+    gtag('js', new Date());
+    gtag('config', 'G-PYVRSFMDRL');
+  </script>
+
+  <link href="https://fonts.googleapis.com/css?family=Google+Sans|Noto+Sans|Castoro" rel="stylesheet">
+  <link rel="stylesheet" href="./static/css/bulma.min.css">
+  <link rel="stylesheet" href="./static/css/bulma-carousel.min.css">
+  <link rel="stylesheet" href="./static/css/bulma-slider.min.css">
+  <link rel="stylesheet" href="./static/css/fontawesome.all.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
+  <link rel="stylesheet" href="./static/css/index.css">
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script defer src="./static/js/fontawesome.all.min.js"></script>
+  <script src="./static/js/bulma-carousel.min.js"></script>
+  <script src="./static/js/bulma-slider.min.js"></script>
+  <script src="./static/js/index.js"></script>
+  
+  <style>
+      /* 表格自定义样式 */
+      .table-container { 
+          overflow-x: auto; 
+          margin-top: 20px;
+          box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+          border-radius: 8px;
+      }
+      .table th {
+          background-color: #f5f5f5;
+          text-align: center !important;
+          vertical-align: middle !important;
+      }
+      .table td {
+          text-align: center !important;
+          vertical-align: middle !important;
+      }
+      .avg-row { 
+          background-color: #e6f7ff !important; /* 浅蓝色背景高亮平均分 */
+          font-weight: bold; 
+      }
+      .best-score { 
+          font-weight: bold; 
+      }
+      .panel-header { 
+          background-color: #fafafa; 
+          font-style: italic; 
+          font-weight: bold; 
+          text-align: left !important; 
+          padding-left: 15px !important;
+          border-top: 2px solid #dbdbdb;
+      }
+      .section-title {
+          margin-bottom: 30px;
+      }
+      .overview-box {
+          background-color: #fcfcfc;
+          border-left: 5px solid #3273dc;
+          padding: 20px;
+          border-radius: 4px;
+          margin-bottom: 20px;
+      }
+      .image-caption {
+          margin-top: 10px;
+          color: #666;
+          font-style: italic;
+      }
+      /* 音频播放器样式微调 */
+      .audio-container {
+          margin-top: 10px;
+          margin-bottom: 10px;
+          padding: 15px;
+          background: #f9f9f9;
+          border-radius: 8px;
+          border: 1px solid #eee;
+          transition: all 0.3s ease;
+      }
+      .audio-container:hover {
+          box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      }
+      .audio-label {
+          font-weight: bold;
+          margin-bottom: 8px;
+          color: #4a4a4a;
+      }
+      audio {
+          width: 100%;
+          height: 40px;
+      }
+      /* 多轮对话样式 */
+      .turn-label {
+          font-size: 0.9em;
+          color: #3273dc;
+          font-weight: bold;
+          text-transform: uppercase;
+          margin-bottom: 5px;
+      }
+      .arrow-icon {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          color: #ccc;
+          font-size: 1.5em;
+      }
+      .subsection-title {
+          margin-top: 40px;
+          margin-bottom: 20px;
+          padding-bottom: 10px;
+          border-bottom: 1px solid #eee;
+      }
+  </style>
+</head>
+<body>
+
+<section class="hero">
+  <div class="hero-body">
+    <div class="container is-max-desktop">
+      <div class="columns is-centered">
+        <div class="column has-text-centered">
+          <h1 class="title is-1 publication-title">WavBench: Benchmarking Reasoning, Colloquialism, and Paralinguistics for End-to-End Spoken Dialogue Models</h1>
+          
+          <div class="is-size-5 publication-authors">
+            <span class="author-block">The WavBench Team</span>
+          </div>
+
+          <div class="column has-text-centered">
+            <div class="publication-links">
+              <span class="link-block">
+                <a href="#" class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon"><i class="fas fa-file-pdf"></i></span>
+                  <span>Paper</span>
+                </a>
+              </span>
+              <span class="link-block">
+                <a href="https://github.com/wavbench" class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon"><i class="fab fa-github"></i></span>
+                  <span>Code</span>
+                </a>
+              </span>
+              <span class="link-block">
+                <a href="https://wavbench.github.io/" class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon"><i class="far fa-images"></i></span>
+                  <span>Data</span>
+                </a>
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+    <div class="container is-max-desktop">
+      <div class="columns is-centered has-text-centered">
+        <div class="column is-full-width">
+            <figure class="image">
+                <img src="./static/images/10-2_logo.png" 
+                     alt="WavBench Overview Results"
+                     style="border-radius: 5px;">
+                <figcaption class="image-caption">Figure 1: Overview of WavBench results comparing five end-to-end spoken dialogue models across <strong>colloquial expression (Basic/Pro)</strong>, <strong>explicit instruction understanding/generation</strong>, and <strong>implicit dialogue</strong>.</figcaption>
+            </figure>
+        </div>
+      </div>
+    </div>
+</section>
+
+<section class="section">
+  <div class="container is-max-desktop">
+    <div class="columns is-centered has-text-centered">
+      <div class="column is-four-fifths">
+        <h2 class="title is-3 section-title">Overview</h2>
+        <div class="content has-text-justified overview-box">
+          <p style="font-size: 1.1em; line-height: 1.8;">
+            WavBench is a comprehensive benchmark tailored for authentic real-world scenarios, designed to evaluate both <strong>audio-centric colloquial semantics</strong> and <strong>paralinguistic fidelity</strong> of end-to-end spoken dialogue models. To rigorously judge responses based on inherent speech characteristics, we establish a holistic framework comprising three distinct tiers: <strong>a Pro subset</strong> to challenge reasoning agents with complex and discriminative tasks; <strong>a Basic subset</strong> to benchmark spoken adaptation; and <strong>an Acoustic set</strong> to assess comprehensive paralinguistic interactions.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container is-max-desktop">
+    <div class="columns is-centered has-text-centered">
+      <div class="column is-four-fifths">
+        <h2 class="title is-3 section-title">Abstract</h2>
+        <div class="content has-text-justified">
+          <p>
+            With the rapid integration of advanced reasoning capabilities into spoken dialogue models, the field urgently demands benchmarks that transcend simple interactions to address real-world complexity. However, current evaluations predominantly adhere to text-generation standards, overlooking the unique audio-centric characteristics of paralinguistics and colloquialisms, alongside the cognitive depth required by modern agents. 
+          </p>
+          <p>
+            To bridge this gap, we introduce WavBench, a comprehensive benchmark designed to evaluate realistic conversational abilities where prior works fall short. Uniquely, WavBench establishes a tripartite framework: 
+            1) <strong>Pro subset</strong>, designed to rigorously challenge reasoning-enhanced models with significantly increased difficulty; 
+            2) <strong>Basic subset</strong>, defining a novel standard for spoken colloquialism that prioritizes "listenability" through natural vocabulary, linguistic fluency, and interactive rapport, rather than rigid written accuracy; and 
+            3) <strong>Acoustic subset, covering explicit understanding, generation, and implicit dialogue</strong> to rigorously evaluate comprehensive paralinguistic capabilities within authentic real-world scenarios. 
+          </p>
+          <p>
+            Through evaluating five state-of-the-art models, WavBench offers critical insights into the intersection of complex problem-solving, colloquial delivery, and paralinguistic fidelity, guiding the evolution of robust spoken dialogue models.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" style="background-color: #f5f5f5;">
+  <div class="container is-max-desktop">
+    <h2 class="title is-3 has-text-centered section-title">Key Features of WavBench</h2>
+    <div class="columns is-centered">
+      <div class="column is-4">
+        <div class="content has-text-centered">
+          <span class="icon is-large has-text-primary"><i class="fas fa-layer-group fa-3x"></i></span>
+          <h4 class="title is-5 mt-4">Tripartite Framework</h4>
+          <p class="has-text-left">
+            Establish a holistic framework comprising <strong>Pro</strong> (Reasoning), <strong>Basic</strong> (Colloquialism), and <strong>Acoustic</strong> (Paralinguistics) subsets.
+          </p>
+        </div>
+      </div>
+      <div class="column is-4">
+        <div class="content has-text-centered">
+          <span class="icon is-large has-text-info"><i class="fas fa-database fa-3x"></i></span>
+          <h4 class="title is-5 mt-4">Massive Scale</h4>
+          <p class="has-text-left">
+            Comprising <strong>17,577 items</strong> totaling <strong>76.5 hours</strong>, covering 7 cognitive domains and 10 paralinguistic attributes.
+          </p>
+        </div>
+      </div>
+      <div class="column is-4">
+        <div class="content has-text-centered">
+          <span class="icon is-large has-text-success"><i class="fas fa-robot fa-3x"></i></span>
+          <h4 class="title is-5 mt-4">Implicit Interaction</h4>
+          <p class="has-text-left">
+            Evaluates both explicit instructions and <strong>implicit multi-turn dialogues</strong>, requiring models to infer acoustic cues without direct prompts.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container is-max-desktop">
+    <h2 class="title is-3 has-text-centered section-title">Illustrative Examples</h2>
+    
+    <div class="columns is-centered">
+      <div class="column is-full-width has-text-centered">
+        <h3 class="title is-4">Colloquial Expression</h3>
+        <p class="mb-4">
+            This set is constructed by aggregating high-quality samples from 15 open-source datasets across seven cognitive domains: <strong>Creative Writing, Instruction Following, Code, Math, QA, Safety, and Logic.</strong> It is organized into two tiers: <strong>Basic</strong> and <strong>Pro</strong>.
+        </p>
+        <figure class="image">
+            <img src="./static/images/colloquial_expression.png" 
+                 alt="Examples of Colloquial Expression in WavBench" 
+                 style="border: 1px solid #ddd; border-radius: 5px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
+            <figcaption class="image-caption">Figure 2: Examples of Colloquial Expression in WavBench.</figcaption>
+        </figure>
+      </div>
+    </div>
+
+    <br/><hr><br/>
+
+    <div class="columns is-centered">
+      <div class="column is-full-width has-text-centered">
+        <h3 class="title is-4">Acoustic Interaction</h3>
+        <p class="mb-4 has-text-justified">
+            This set comprises three components: Explicit Understanding, Explicit Generation, and Implicit Dialogue. It rigorously examines 10 paralinguistic dimensions, including speaker information (Age, Gender, Accent, Language), acoustic characteristics (Pitch, Speed, Volume, Emotion), and background sounds (Audio, Music). Specific attributes include: <strong>Age</strong> (Children, Adolescent, Middle-aged, Elderly), <strong>Gender</strong> (Male, Female), <strong>Accent</strong> (Indian, Canadian, British, Singaporean, American, Australian), <strong>Language</strong> (Chinese, English), <strong>Pitch</strong> (Low, Normal, High), <strong>Speed</strong> (Slow, Normal, Fast), <strong>Volume</strong> (Low, Normal, High), <strong>Emotion</strong> (Neutral, Happy, Sad, Angry, Surprised, Disgusted, Fearful), <strong>Audio</strong> (Wind noise, People crowd, Thunder, Cap gun shooting, Door slamming), and <strong>Music</strong> (Piano, Guitar, Drum).
+        </p>
+        <figure class="image">
+            <img src="./static/images/acoustic_interaction.png" 
+                 alt="Examples of Acoustic Interaction in WavBench" 
+                 style="border: 1px solid #ddd; border-radius: 5px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
+            <figcaption class="image-caption">Figure 3: Examples of Acoustic Interaction in WavBench.</figcaption>
+        </figure>
+      </div>
+    </div>
+
+    <br/>
+    
+    <h3 class="title is-4 has-text-centered section-title" style="margin-top: 50px;">Audio Samples</h3>
+
+    <h4 class="title is-5 subsection-title">Explicit Understanding Samples</h4>
+    <div class="columns is-centered is-multiline">
+        <div class="column is-5 has-text-centered">
+            <div class="audio-container">
+                <p class="audio-label">Explicit Understanding - Accent</p>
+                <audio controls>
+                    <source src="./static/audio/explicit_accent_understanding_0002.wav" type="audio/wav">
+                    Your browser does not support the audio element.
+                </audio>
+            </div>
+        </div>
+        <div class="column is-5 has-text-centered">
+            <div class="audio-container">
+                <p class="audio-label">Explicit Understanding - Emotion</p>
+                <audio controls>
+                    <source src="./static/audio/explicit_age_understanding_0768.wav" type="audio/wav">
+                    Your browser does not support the audio element.
+                </audio>
+            </div>
+        </div>
+        <div class="column is-5 has-text-centered">
+            <div class="audio-container">
+                <p class="audio-label">Explicit Understanding - Age</p>
+                <audio controls>
+                    <source src="./static/audio/age_0005.wav" type="audio/wav">
+                    Your browser does not support the audio element.
+                </audio>
+            </div>
+        </div>
+        <div class="column is-5 has-text-centered">
+            <div class="audio-container">
+                <p class="audio-label">Explicit Understanding - Audio</p>
+                <audio controls>
+                    <source src="./static/audio/audio_0042.wav" type="audio/wav">
+                    Your browser does not support the audio element.
+                </audio>
+            </div>
+        </div>
+    </div>
+
+    <h4 class="title is-5 subsection-title">Implicit Single-Turn Samples</h4>
+    <div class="columns is-centered">
+        <div class="column is-5 has-text-centered">
+            <div class="audio-container">
+                <p class="audio-label">Implicit Dialogue (Sample 1)</p>
+                <audio controls>
+                    <source src="./static/audio/implicit_emotion_generation_3786-user_input.wav" type="audio/wav">
+                    Your browser does not support the audio element.
+                </audio>
+            </div>
+        </div>
+        <div class="column is-5 has-text-centered">
+            <div class="audio-container">
+                <p class="audio-label">Implicit Dialogue (Sample 2)</p>
+                <audio controls>
+                    <source src="./static/audio/implicit_emotion_generation_5287-user_input.wav" type="audio/wav">
+                    Your browser does not support the audio element.
+                </audio>
+            </div>
+        </div>
+    </div>
+
+    <h4 class="title is-5 subsection-title">Implicit Multi-Turn Samples (Contextual Dialogue)</h4>
+    <div class="columns is-centered is-vcentered">
+        
+        <div class="column is-2 has-text-centered">
+            <div class="turn-label">Turn 1</div>
+            <div class="audio-container" style="padding: 5px;">
+                <audio controls style="height: 30px;">
+                    <source src="./static/audio/multi_round_generation_1576-user1.wav" type="audio/wav">
+                </audio>
+            </div>
+        </div>
+
+        <div class="column is-1 arrow-icon">
+            <i class="fas fa-arrow-right"></i>
+        </div>
+
+        <div class="column is-2 has-text-centered">
+            <div class="turn-label">Turn 2</div>
+            <div class="audio-container" style="padding: 5px;">
+                <audio controls style="height: 30px;">
+                    <source src="./static/audio/multi_round_generation_1576-user2.wav" type="audio/wav">
+                </audio>
+            </div>
+        </div>
+
+        <div class="column is-1 arrow-icon">
+            <i class="fas fa-arrow-right"></i>
+        </div>
+
+        <div class="column is-2 has-text-centered">
+            <div class="turn-label">Turn 3</div>
+            <div class="audio-container" style="padding: 5px;">
+                <audio controls style="height: 30px;">
+                    <source src="./static/audio/multi_round_generation_1576-user3.wav" type="audio/wav">
+                </audio>
+            </div>
+        </div>
+
+        <div class="column is-1 arrow-icon">
+            <i class="fas fa-arrow-right"></i>
+        </div>
+
+        <div class="column is-2 has-text-centered">
+            <div class="turn-label">Turn 4</div>
+            <div class="audio-container" style="padding: 5px;">
+                <audio controls style="height: 30px;">
+                    <source src="./static/audio/multi_round_generation_1576-user4.wav" type="audio/wav">
+                </audio>
+            </div>
+        </div>
+
+    </div>
+
+  </div>
+</section>
+
+<section class="section">
+  <div class="container is-max-desktop">
+    <h2 class="title is-3 has-text-centered section-title">Evaluation Results</h2>
+    <div class="content">
+        <p class="has-text-centered">
+            <strong>Table 2: Overall Evaluation of WavBench.</strong> The evaluation is organized into five panels: (A) <strong>Colloquial Expression (Pro Subset)</strong>; (B) <strong>Colloquial Expression (Basic Subset)</strong>; (C) <strong>Explicit Acoustic Understanding</strong>; (D) <strong>Explicit Acoustic Generation</strong>; and (E) <strong>Implicit Acoustic Capability</strong>.
+        </p>
+        <div class="table-container">
+            <table class="table is-bordered is-striped is-hoverable is-fullwidth">
+                <thead>
+                    <tr>
+                        <th>Metrics / Tasks</th>
+                        <th>Qwen3-Omni</th>
+                        <th>Kimi-Audio</th>
+                        <th>Mimo-Audio</th>
+                        <th>Step-Audio-2</th>
+                        <th>GPT-4o Audio</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td colspan="6" class="panel-header">Panel A: Colloquial Expression Capability - Pro Subset</td></tr>
+                    <tr><td>Code</td><td>39.75</td><td>30.29</td><td>28.96</td><td>31.20</td><td class="best-score">53.60</td></tr>
+                    <tr><td>Creativity</td><td>48.39</td><td>31.78</td><td>42.86</td><td>35.00</td><td class="best-score">63.00</td></tr>
+                    <tr><td>Instruction</td><td>43.01</td><td>29.86</td><td>36.44</td><td>29.40</td><td class="best-score">57.80</td></tr>
+                    <tr><td>Logic</td><td>33.21</td><td>26.03</td><td>27.57</td><td>26.20</td><td class="best-score">42.60</td></tr>
+                    <tr><td>Math</td><td>38.55</td><td>27.30</td><td>25.68</td><td>22.40</td><td class="best-score">50.20</td></tr>
+                    <tr><td>QA</td><td>50.93</td><td>42.54</td><td>41.28</td><td>40.80</td><td class="best-score">72.80</td></tr>
+                    <tr><td>Safety</td><td>60.00</td><td>56.19</td><td>56.19</td><td>52.40</td><td class="best-score">67.60</td></tr>
+                    <tr class="avg-row"><td>Avg (Pro)</td><td>39.53</td><td>30.79</td><td>32.02</td><td>30.40</td><td class="best-score" style="text-decoration: underline;">58.23</td></tr>
+
+                    <tr><td colspan="6" class="panel-header">Panel B: Colloquial Expression Capability - Basic Subset</td></tr>
+                    <tr><td>Code</td><td>53.10</td><td>40.69</td><td>42.07</td><td>37.20</td><td class="best-score">58.00</td></tr>
+                    <tr><td>Creativity</td><td>57.44</td><td>41.57</td><td>45.29</td><td>47.20</td><td class="best-score">71.20</td></tr>
+                    <tr><td>Instruction</td><td>57.29</td><td>44.41</td><td>33.56</td><td>36.60</td><td class="best-score">66.80</td></tr>
+                    <tr><td>Logic</td><td>52.35</td><td>50.74</td><td>49.91</td><td>48.80</td><td class="best-score">67.00</td></tr>
+                    <tr><td>Math</td><td>51.05</td><td>41.27</td><td>38.73</td><td>30.20</td><td class="best-score">62.40</td></tr>
+                    <tr><td>QA</td><td>57.54</td><td>49.07</td><td>49.12</td><td>48.60</td><td class="best-score">75.60</td></tr>
+                    <tr><td>Safety</td><td>59.67</td><td>58.83</td><td>62.83</td><td>60.20</td><td class="best-score">81.00</td></tr>
+                    <tr class="avg-row"><td>Avg (Basic)</td><td>55.80</td><td>49.23</td><td>49.57</td><td>48.50</td><td class="best-score" style="text-decoration: underline;">68.80</td></tr>
+
+                    <tr><td colspan="6" class="panel-header">Panel C: Acoustic Explicit Understanding</td></tr>
+                    <tr><td>Accent</td><td class="best-score">37.50</td><td>11.00</td><td>27.00</td><td>20.67</td><td>15.67</td></tr>
+                    <tr><td>Age</td><td>64.33</td><td>53.67</td><td>53.00</td><td class="best-score">67.67</td><td>20.33</td></tr>
+                    <tr><td>Emotion</td><td class="best-score">92.86</td><td>77.33</td><td>77.33</td><td>75.43</td><td>85.90</td></tr>
+                    <tr><td>Gender</td><td>21.00</td><td>44.50</td><td>20.00</td><td class="best-score">68.00</td><td>61.50</td></tr>
+                    <tr><td>Language</td><td>83.50</td><td>91.00</td><td>53.50</td><td>96.50</td><td class="best-score">97.00</td></tr>
+                    <tr><td>Pitch</td><td>32.44</td><td>23.11</td><td>24.00</td><td class="best-score">34.22</td><td>23.56</td></tr>
+                    <tr><td>Speed</td><td>46.67</td><td class="best-score">54.67</td><td>48.89</td><td>44.00</td><td>48.00</td></tr>
+                    <tr><td>Volume</td><td>33.78</td><td>38.22</td><td>31.11</td><td class="best-score">50.67</td><td>41.78</td></tr>
+                    <tr><td>Audio Event</td><td>61.73</td><td class="best-score">67.90</td><td>19.75</td><td>39.51</td><td>59.26</td></tr>
+                    <tr><td>Music</td><td>22.22</td><td>66.67</td><td>55.56</td><td class="best-score">77.78</td><td>33.33</td></tr>
+                    <tr class="avg-row"><td>Avg (Understand)</td><td>49.60</td><td>52.80</td><td>41.02</td><td class="best-score" style="text-decoration: underline;">57.36</td><td>48.70</td></tr>
+
+                    <tr><td colspan="6" class="panel-header">Panel D: Acoustic Explicit Generation</td></tr>
+                    <tr><td>Accent</td><td>37.50</td><td>3.52</td><td>23.44</td><td>22.07</td><td class="best-score">74.22</td></tr>
+                    <tr><td>Age</td><td>64.65</td><td>46.88</td><td>51.95</td><td>31.64</td><td class="best-score">78.12</td></tr>
+                    <tr><td>Emotion</td><td>90.04</td><td>50.29</td><td>57.13</td><td>66.50</td><td class="best-score">95.51</td></tr>
+                    <tr><td>Gender</td><td>72.27</td><td>45.31</td><td>67.58</td><td>59.77</td><td class="best-score">98.83</td></tr>
+                    <tr><td>Language</td><td>89.84</td><td>74.80</td><td>51.56</td><td class="best-score">91.41</td><td>87.89</td></tr>
+                    <tr><td>Pitch</td><td>76.56</td><td>47.27</td><td>80.27</td><td>55.66</td><td class="best-score">85.74</td></tr>
+                    <tr><td>Speed</td><td>43.75</td><td>47.27</td><td>51.56</td><td class="best-score">69.14</td><td>66.60</td></tr>
+                    <tr><td>Volume</td><td>56.25</td><td>64.06</td><td>59.96</td><td>57.03</td><td class="best-score">82.42</td></tr>
+                    <tr><td>Audio</td><td>27.03</td><td>10.81</td><td>9.46</td><td>32.43</td><td class="best-score">45.95</td></tr>
+                    <tr><td>Music</td><td>62.50</td><td>20.83</td><td>16.67</td><td class="best-score">70.83</td><td>77.08</td></tr>
+                    <tr class="avg-row"><td>Avg (Generation)</td><td>62.03</td><td>41.10</td><td>46.93</td><td>55.65</td><td class="best-score" style="text-decoration: underline;">79.23</td></tr>
+
+                    <tr><td colspan="6" class="panel-header">Panel E: Implicit Acoustic Interaction</td></tr>
+                    <tr><td>Single-Turn (Text)</td><td>1.85</td><td>1.84</td><td>2.23</td><td>1.12</td><td class="best-score">2.43</td></tr>
+                    <tr><td>Single-Turn (Audio)</td><td>3.17</td><td>3.21</td><td>2.47</td><td class="best-score">3.50</td><td>2.96</td></tr>
+                    <tr><td>Multi-Turn (Text)</td><td class="best-score">4.88</td><td>4.57</td><td>4.61</td><td>4.38</td><td>4.48</td></tr>
+                    <tr><td>Multi-Turn (Audio)</td><td class="best-score">1.25</td><td>1.08</td><td>1.04</td><td>1.21</td><td>1.23</td></tr>
+                    <tr class="avg-row"><td>Avg (Implicit)</td><td class="best-score" style="text-decoration: underline;">2.78</td><td>2.67</td><td>2.59</td><td>2.55</td><td class="best-score" style="text-decoration: underline;">2.78</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+
+
+<section class="section" id="BibTeX">
+  <div class="container is-max-desktop content">
+    <h2 class="title">BibTeX</h2>
+    <pre><code>@article{wavbench2024,
+  title={WavBench: Benchmarking Reasoning, Colloquialism, and Paralinguistics for End-to-End Spoken Dialogue Models},
+  author={WavBench Team},
+  journal={arXiv preprint},
+  year={2024}
+}</code></pre>
+  </div>
+</section>
+
+
+<footer class="footer">
+  <div class="container">
+    <div class="content has-text-centered">
+      <a class="icon-link" href="#" class="external-link" disabled>
+        <i class="fab fa-github"></i>
+      </a>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
